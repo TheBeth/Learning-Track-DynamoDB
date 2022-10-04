@@ -8,8 +8,8 @@ AWS.config.update({
 });
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
-const USER_TABLE = "..."; //Change this by table name
-const PET_TABLE = "..."; //Change this by table name
+const USER_TABLE = "..."; //Change this with table name
+const PET_TABLE = "..."; //Change this with table name
 
 exports.getAllUser = async (req, res) => {
   try {
@@ -86,14 +86,6 @@ exports.editUser = async (req, res) => {
       Key: { id },
     };
     const isUser = await dynamoClient.get(params).promise();
-    if (!isUser.Item) {
-      return res.status(400).json({ message: "Id not found." });
-    }
-
-    const user = req.body;
-    if (req.body.userName) {
-      return res.status(400).json({ message: "Can not change username" });
-    }
 
     if (!req.body.firstName) {
       req.body.firstName = isUser.Item.firstName;
@@ -107,6 +99,7 @@ exports.editUser = async (req, res) => {
 
     user.userName = isUser.Item.userName;
     user.id = id;
+    user.petName = isUser.Item.petName;
     const query = {
       TableName: USER_TABLE,
       Item: user,
@@ -205,6 +198,34 @@ exports.getPetByUser = async (req, res) => {
       havePet.push(pet.Item);
     }
     res.status(200).json({ Pets: havePet });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+exports.petNotOwn = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const allPetParams = { TableName: PET_TABLE };
+    const allPet = await dynamoClient.scan(allPetParams).promise();
+    const paramsUser = {
+      TableName: USER_TABLE,
+      Key: { id },
+    };
+    const havePet = [];
+    const user = await dynamoClient.get(paramsUser).promise();
+    for (let i = 0; i < user.Item.petName.length; i++) {
+      const query = { TableName: PET_TABLE, Key: { id: user.Item.petName[i] } };
+      const pet = await dynamoClient.get(query).promise();
+      if (pet.Item !== undefined) {
+        havePet.push(pet.Item);
+      }
+    }
+    let petNotOwn = allPet.Items.filter(
+      (o1) => !havePet.some((o2) => o1.id === o2.id)
+    );
+
+    res.status(200).json({ NotOwn: petNotOwn });
   } catch (err) {
     res.status(400).json(err);
   }

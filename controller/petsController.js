@@ -8,12 +8,14 @@ AWS.config.update({
 });
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
-const PET_TABLE = "..."; //Change this by table name
+const USER_TABLE = "..."; //Change this with table name
+const PET_TABLE = "..."; //Change this with table name
 
 exports.getAllPet = async (req, res) => {
   try {
     const query = { TableName: PET_TABLE };
     const pets = await dynamoClient.scan(query).promise();
+
     res.status(200).json(pets);
   } catch (err) {
     res.status(400).send(err);
@@ -37,6 +39,13 @@ exports.getPetById = async (req, res) => {
 exports.createPet = async (req, res) => {
   try {
     const pet = req.body;
+    let arrayName = [];
+    pet.petName = pet.petName.split(" ");
+    pet.petName.map((item) => {
+      let newWord = item.charAt(0).toUpperCase() + item.slice(1).toLowerCase();
+      arrayName.push(newWord);
+    });
+    pet.petName = arrayName.join("");
     if (!req.body.petName) {
       return res.status(400).json({ message: "petName require" });
     }
@@ -130,9 +139,32 @@ exports.deletePet = async (req, res) => {
       return res.status(400).json({ message: "ID not found" });
     }
 
+    const params = {
+      TableName: USER_TABLE,
+    };
+    const user = await dynamoClient.scan(params).promise();
+    for (let i in user.Items) {
+      let newPetList = user.Items[i].petName.filter((item) => item != petId);
+      let editUser = {
+        id: user.Items[i].id,
+        userName: user.Items[i].userName,
+        firstName: user.Items[i].firstName,
+        lastName: user.Items[i].lastName,
+        age: user.Items[i].age,
+        petName: newPetList,
+      };
+
+      const query = {
+        TableName: USER_TABLE,
+        Item: editUser,
+      };
+      const newUser = await dynamoClient.put(query).promise();
+    }
+
     await dynamoClient.delete(query).promise();
-    res.status(200).json();
+    res.status(200).json("deleted");
   } catch (err) {
+    console.log(err);
     res.status(400).json(err);
   }
 };
