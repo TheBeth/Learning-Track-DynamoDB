@@ -59,8 +59,9 @@ exports.createUser = async (req, res, next) => {
     // }
 
     const haveUser = existingUser.Items.filter((item) => {
-      return item.userName == req.body.userName;
+      return item.userName.toLowerCase() == req.body.userName.toLowerCase();
     });
+    console.log(haveUser);
     if (haveUser[0]) {
       return res.status(400).json({ message: "Username already in use." });
     }
@@ -96,10 +97,14 @@ exports.editUser = async (req, res) => {
     if (!req.body.age) {
       req.body.age = isUser.Item.age;
     }
-
-    user.userName = isUser.Item.userName;
-    user.id = id;
-    user.petName = isUser.Item.petName;
+    let user = {
+      userName: isUser.Item.userName,
+      id: id,
+      petName: isUser.Item.petName,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      age: req.body.age,
+    };
     const query = {
       TableName: USER_TABLE,
       Item: user,
@@ -107,6 +112,7 @@ exports.editUser = async (req, res) => {
     const newUser = await dynamoClient.put(query).promise();
     res.status(200).json(newUser);
   } catch (err) {
+    console.log(err);
     res.status(400).json(err);
   }
 };
