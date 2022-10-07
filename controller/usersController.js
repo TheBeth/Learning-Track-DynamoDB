@@ -8,8 +8,8 @@ AWS.config.update({
 });
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
-const USER_TABLE = "..."; //Change this with table name
-const PET_TABLE = "..."; //Change this with table name
+const USER_TABLE = process.env.USER_TABLE;
+const PET_TABLE = process.env.PET_TABLE;
 
 exports.getAllUser = async (req, res) => {
   try {
