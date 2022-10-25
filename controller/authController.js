@@ -16,7 +16,8 @@ exports.login = (req, res) => {
   });
   user.authenticateUser(AuthDetail, {
     onSuccess(data) {
-      res.status(200).json(data.idToken.jwtToken);
+      console.log;
+      res.status(200).json(data.accessToken.jwtToken);
     },
     onFailure(data) {
       res.status(400).json(data);

@@ -12,6 +12,7 @@
   "dependencies": {
     "amazon-cognito-identity-js": "^5.2.10",
     "aws-sdk": "^2.1213.0",
+    "cognito-express": "^3.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",

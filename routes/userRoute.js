@@ -11,18 +11,19 @@ const {
   petNotOwn,
 } = require("../controller/usersController");
 const { login } = require("../controller/authController");
+const { validateAuth } = require("../middlewares/authenticate");
 
 const router = express.Router();
 
-router.get("/", getAllUser);
-router.get("/:id", getUserById);
-router.get("/getPet/:id", getPetByUser);
-router.get("/notOwn/:id", petNotOwn);
-router.post("/", createUser);
-router.put("/:id", editUser);
-router.delete("/:id", deleteUser);
-router.put("/addPet/:id", addPet);
-router.put("/deletePet/:id", deletePet);
+router.get("/", validateAuth, getAllUser);
+router.get("/:id", validateAuth, getUserById);
+router.get("/getPet/:id", validateAuth, getPetByUser);
+router.get("/notOwn/:id", validateAuth, petNotOwn);
+router.post("/", validateAuth, createUser);
+router.put("/:id", validateAuth, editUser);
+router.delete("/:id", validateAuth, deleteUser);
+router.put("/addPet/:id", validateAuth, addPet);
+router.put("/deletePet/:id", validateAuth, deletePet);
 router.post("/login", login);
 
 module.exports = router;

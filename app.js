@@ -13,7 +13,10 @@ app.use(cors());
 app.use("/users", usersRoute);
 app.use("/pets", petsRoute);
 
-app.use("*", (req, res) => res.status(400).send("Resouces not found"));
+app.use("*", (req, res) => res.status(404).send("Resouces not found"));
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({ message: err.message });
+});
 
 const port = process.env.PORT || 8050;
 app.listen(port, () => console.log(`Server running port ${port}`));

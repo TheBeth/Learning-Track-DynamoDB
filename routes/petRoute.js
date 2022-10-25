@@ -6,13 +6,14 @@ const {
   deletePet,
   getPetById,
 } = require("../controller/petsController");
+const { validateAuth } = require("../middlewares/authenticate");
 
 const router = express.Router();
 
-router.get("/", getAllPet);
-router.get("/:petId", getPetById);
-router.post("/", createPet);
-router.put("/:petId", editPet);
-router.delete("/:petId", deletePet);
+router.get("/", validateAuth, getAllPet);
+router.get("/:petId", validateAuth, getPetById);
+router.post("/", validateAuth, createPet);
+router.put("/:petId", validateAuth, editPet);
+router.delete("/:petId", validateAuth, deletePet);
 
 module.exports = router;

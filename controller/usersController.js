@@ -51,12 +51,8 @@ exports.createUser = async (req, res, next) => {
     const idInUse = [];
     existingUser.Items.filter((item) => {
       idInUse.push(item.id);
-      // return item.id == req.body.id;
     });
     const newId = Math.max(...idInUse) + 1;
-    // if (haveId) {
-    //   return res.status(400).json({ message: "ID already in use" });
-    // }
 
     const haveUser = existingUser.Items.filter((item) => {
       return item.userName.toLowerCase() == req.body.userName.toLowerCase();
