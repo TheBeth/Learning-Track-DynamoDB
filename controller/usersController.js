@@ -57,7 +57,7 @@ exports.createUser = async (req, res, next) => {
     const haveUser = existingUser.Items.filter((item) => {
       return item.userName.toLowerCase() == req.body.userName.toLowerCase();
     });
-    console.log(haveUser);
+
     if (haveUser[0]) {
       return res.status(400).json({ message: "Username already in use." });
     }
